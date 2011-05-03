@@ -1,0 +1,107 @@
+Interactive Command line Interface to Rackspace Cloud Files
+----------------------------------
+
+Description:
+------------
+This is a python based command line interface for Rackspace Cloud Files.  It provides a nice interactive interface to manage your Cloud Files from the Linux or Window machines using python.
+
+I know we can always use python API commands and curl to list things, but it might be helpful for customers who have no programming knowledge, and also they call the upload or download files directly from cron job, etc.
+
+
+Current implemented function:
+-----------------------------
+list containers
+create container
+delete container(empty containers)
+container info - gives information about a container, like total size, publish status, CDN URL.
+list files
+delete files
+upload files
+download files
+
+USAGE
+-----
+root@ssidhu-dv6:/home/ssidhu/Dropbox/tinkering/scripts/python_cf# python cf.py 
+Login with credentials from ~/.pycflogin file? [yes/no]yes
+-Info- Logging in as sandeepsidhu
+Interactive command line interface to cloud files
+CF>>list
+.CDN_ACCESS_LOGS
+cloudservers
+images
+sand
+CF>>list sand
+New folder/New Text Document.txt
+cloudfuse
+cloudfuse-0.1.tar.gz
+cloudfuse.tar.gz
+cloudfuse_1.0-1_amd64.deb
+file1
+https_webpage_status.png
+CF>>quit
+root@ssidhu-dv6:/home/ssidhu/Dropbox/tinkering/scripts/python_cf#
+
+I have created it in a module way, so each of those functions can be called individually without actually running interpreter, so if somebody wants to just grab a list of files in a container, he can just call the individual function files.  This will help if somebody wants to write their own scripts.
+
+root@ssidhu-dv6:/home/ssidhu/Dropbox/tinkering/scripts/python_cf# python cf_list_containers.py
+-Info- Logging in as sandeepsidhu
+.CDN_ACCESS_LOGS
+cloudservers
+images
+sand
+root@ssidhu-dv6:/home/ssidhu/Dropbox/tinkering/scripts/python_cf# python cf_list_files.py sand
+-Info- Logging in as sandeepsidhu
+New folder/New Text Document.txt
+cloudfuse
+cloudfuse-0.1.tar.gz
+cloudfuse.tar.gz
+cloudfuse_1.0-1_amd64.deb
+file1
+https_webpage_status.png
+root@ssidhu-dv6:/home/ssidhu/Dropbox/tinkering/scripts/python_cf# 
+
+
+Some ideas about next features to add:
+-------------------------------------
+delete container along with it's all files(non empty containers)
+publish/unpublish containers
+file info - will provide all the info about a file, size, CDN URL, meta data, etc
+purge from CDN
+upload multiple directories, handling of pseudo directories.
+use of servicenet option
+
+
+LICENSE
+-------
+
+Unless otherwise noted, all files are released under the `MIT`_ license,
+exceptions contain licensing information in them.
+
+.. _`MIT`: http://en.wikipedia.org/wiki/MIT_License
+
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be included in
+  all copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  SOFTWARE.
+
+  Except as contained in this notice, the name of Rackspace US, Inc. shall not
+  be used in advertising or otherwise to promote the sale, use or other dealings
+  in this Software without prior written authorisation from Rackspace US, Inc. 
+
+
+Author:
+------
+Sandeep Sidhu, sandeep.pal.sidhu at gmail dot com.
