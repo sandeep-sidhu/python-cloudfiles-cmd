@@ -1,14 +1,13 @@
-import sys
 import cloudfiles
 import gzip
 import StringIO
 import os
-import time
 import argparse
 import cf_connect
 
+
 def format_filename(log_name):
-    """Converts log object name to container name and file name 
+    """Converts log object name to container name and file name
     Input
     Log name:
     MyContainer/2011/06/10/04/e0c6bb6a9a704789c525bf5d022ce2b7.log.0.gz
@@ -17,7 +16,7 @@ def format_filename(log_name):
     MyContainer
     Filename:
     2011061004-e0c6bb6a9a704789c525bf5d022ce2b7.log
-    
+
     """
     names = log_name.partition('/')
     filename = names[2].replace('/', '', 3)
@@ -26,9 +25,10 @@ def format_filename(log_name):
     container = names[0]
     return container, filename
 
+
 def cache_log(container, filename, data, directory):
     """Writes object to file in directory specified
-    
+
     """
     try:
         os.makedirs('/'.join((directory, container)))
@@ -37,7 +37,8 @@ def cache_log(container, filename, data, directory):
     with open('/'.join((directory, container, filename)), 'wb') as f:
         f.write(data)
 
-def _generate_object_list(container, path_prefix=""):
+
+def generate_object_list(container, path_prefix=""):
     """Returns a list of all files in the container that match the
     specified prefix. If no prefix supplied all objects returned.
 
@@ -51,27 +52,29 @@ def _generate_object_list(container, path_prefix=""):
         obj_list_temp = container.list_objects(prefix=path_prefix, marker=mark)
     return obj_list
 
+
 def list_logs(container_object, search_term, num_files=0):
     """Lists num_files newest logs
-    
+
     """
-    obj_list = _generate_object_list(container_object, path_prefix=search_term)
+    obj_list = generate_object_list(container_object, path_prefix=search_term)
     return  obj_list[-num_files:]
+
 
 def get_logs(connection, container_search_term, cache=True, num_files=0,
              directory="DownloadedLogFiles"):
     """ Download log files for a container and cat them.
-    
-    cache=True controls whether or not the logs are cached not if the cache is 
+
+    cache=True controls whether or not the logs are cached not if the cache is
     read. The cache is always read.
     default downloads all log files
-    num_files is integer specifying number of files to download. The most  
-    recent file is num_files=1, if num_files is not specified or 0 all files 
+    num_files is integer specifying number of files to download. The most
+    recent file is num_files=1, if num_files is not specified or 0 all files
     downloaded
-    
+
     """
-    object = ""
-    log_object_prefix = "/".join((container_search_term, object))
+    obj = ""
+    log_object_prefix = "/".join((container_search_term, obj))
     logs_container_name = ".CDN_ACCESS_LOGS"
     try:
         logs_container = connection.get_container(logs_container_name)
@@ -81,8 +84,8 @@ def get_logs(connection, container_search_term, cache=True, num_files=0,
             container, filename = format_filename(log)
             try:
                 file_path = (directory, container, filename)
-                with open('/'.join(file_path), 'rb') as file:
-                    data.append(file.read())
+                with open('/'.join(file_path), 'rb') as f:
+                    data.append(f.read())
             except IOError:
                 log_gz = logs_container.get_object(log).read()
                 log_gz_fobj = StringIO.StringIO(log_gz)
