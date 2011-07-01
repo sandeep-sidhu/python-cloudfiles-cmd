@@ -1,8 +1,8 @@
 __author__ = "Sandeep Sidhu <sandeep.pal.sidhu@gmail.com>"
 import cmd
 import os
-from cf_connect import open_connection_with_configfile
-from cf_connect import open_connection_with_credentials
+import argparse
+from cf_connect import open_connection
 from cf_list_containers import list_containers
 from cf_list_containers import list_public_containers
 from cf_list_files import list_files
@@ -27,20 +27,21 @@ class InteractiveCloudfiles(cmd.Cmd):
         self.dst_directory = "./"
         self.verbose = 3
         self.last_output = ''
+        self.conx = open_connection()
         cmd.Cmd.__init__(self)
 
     def do_list(self, line):
         if (self.use_container == ".." or not self.use_container):
             if line:
-                list_files(conx, line)
+                list_files(self.conx, line)
             else:
-                list_containers(conx)
+                list_containers(self.conx)
         else:
-            list_files(conx, self.use_container)
+            list_files(self.conx, self.use_container)
     do_ls = do_list
 
     def do_list_public(self, line):
-        list_public_containers(conx)
+        list_public_containers(self.conx)
 
     def do_download(self, line):
         if line:
@@ -51,7 +52,7 @@ class InteractiveCloudfiles(cmd.Cmd):
             else:
                 for argument in arguments:
                     print "-Info- now downloading '%s'" % argument
-                    download_file(conx, self.use_container, argument,
+                    download_file(self.conx, self.use_container, argument,
                                   self.dst_directory, self.verbose)
         else:
             print '-Error- no filename[s] given to download'
@@ -66,7 +67,7 @@ class InteractiveCloudfiles(cmd.Cmd):
             else:
                 for argument in arguments:
                     print "-Info- now uploading '%s'" % argument
-                    upload_file(conx, self.use_container,
+                    upload_file(self.conx, self.use_container,
                                 argument, self.verbose)
         else:
             print '-Error- no filename[s] given to upload'
@@ -74,7 +75,7 @@ class InteractiveCloudfiles(cmd.Cmd):
 
     def do_create(self, line):
         if line:
-            create_container(conx, line, self.verbose)
+            create_container(self.conx, line, self.verbose)
         else:
             print("-Info- no container named passed, please try 'help create' "
                   "to learn the command options")
@@ -113,7 +114,7 @@ class InteractiveCloudfiles(cmd.Cmd):
             answer = raw_input(
                 'Do you really want to remove the container? [yes/no]')
             if answer.lower() == "yes":
-                delete_container(conx, line, self.verbose)
+                delete_container(self.conx, line, self.verbose)
             else:
                 print 'Container not deleted, canceled by user action'
         else:
@@ -128,9 +129,9 @@ class InteractiveCloudfiles(cmd.Cmd):
 
     def do_info(self, line):
         if line:
-            info_container(conx, line, self.verbose)
+            info_container(self.conx, line, self.verbose)
         else:
-            info_container(conx, self.use_container, self.verbose)
+            info_container(self.conx, self.use_container, self.verbose)
 
     def help_info(self):
         print '\n'.join(['info [container_name]',
@@ -140,7 +141,7 @@ class InteractiveCloudfiles(cmd.Cmd):
     def do_logout(self, line):
         if self.verbose >= 2:
             print '-Debug- Logging off'
-        conx.logout()
+        self.conx.logout()
         if self.verbose >= 1:
             print '-Info- Logged off current session'
 
@@ -194,15 +195,4 @@ class InteractiveCloudfiles(cmd.Cmd):
     help_quit = help_exit
 
 if __name__ == '__main__':
-    answer = raw_input('Login with credentials from'
-                       ' ~/.pycflogin file? [yes/no]')
-    if answer.lower() == "yes":
-        conx = open_connection_with_configfile()
-    else:
-        print 'Please provide the Cloud Files login details'
-        username = raw_input('username:')
-        api_key = raw_input('api_key:')
-        auth_url = raw_input('auth_url, [us/uk]')
-        conx = open_connection_with_credentials(username, api_key, auth_url)
-
     InteractiveCloudfiles().cmdloop()
