@@ -100,16 +100,7 @@ def get_logs(connection, container_search_term, cache=True, num_files=0,
         print "Either logs aren't enabled or no logs have been generated yet."
 
 if __name__ == '__main__':
-    resp = raw_input('Login with credentials from ~/.pycflogin file? [yes/no]')
-    if resp.lower() == "yes":
-        conx = cf_connect.open_connection_with_configfile()
-    else:
-        print 'Please provide the Cloud Files login details'
-        username = raw_input('username:')
-        api_key = raw_input('api_key:')
-        auth_url = raw_input('auth_url, [us/uk]')
-        conx = cf_connect.open_connection_with_credentials(username, api_key,
-                                                           auth_url)
+    conx = cf_connect.open_connection()
     parser = argparse.ArgumentParser(description='Display container CDN logs.')
     parser.add_argument('container',
                         help='name of CDN and log enabled container')
