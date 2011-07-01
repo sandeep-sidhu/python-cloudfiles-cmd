@@ -33,13 +33,13 @@ def open_connection_with_configfile(config_file='~/.pycflogin',verbose=0):
         apikey = config.get('account', 'apikey')
         location = config.get('account', 'location')
         if location == "uk" or location == "UK":
-       auth_url="https://lon.auth.api.rackspacecloud.com/v1.0"
+            auth_url="https://lon.auth.api.rackspacecloud.com/v1.0"
         else:
-       auth_url="https://auth.api.rackspacecloud.com/v1.0"
+            auth_url="https://auth.api.rackspacecloud.com/v1.0"
         if verbose >= 1: print '-Info- Logging in as', username
         if verbose >= 2: print '-Debug- Using AUTH-URL as', auth_url
     else:
-    if verbose >= 1: print '-Info- %s file does not exists' % config_file
+        if verbose >= 1: print '-Info- %s file does not exists' % config_file
     print '-Info- No existing configuration file found %s , would you like to create one?\n' % config_file
     answer = raw_input('Please enter yes to provide new credentials or no to exit. [yes/no]:')
     if answer == 'yes' or answer == 'YES':
@@ -87,5 +87,5 @@ if __name__ == '__main__':
     try:
         print conn
     finally:
-    if verbose >= 1: print "-Info- Logging out"
+        if verbose >= 1: print "-Info- Logging out"
         conn.logout()
