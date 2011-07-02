@@ -1,3 +1,4 @@
+import sys
 import cloudfiles
 import gzip
 import StringIO
@@ -7,7 +8,8 @@ import cf_connect
 
 
 def format_filename(log_name):
-    """Converts log object name to container name and file name
+    """Convert log object name to container name and file name.
+
     Input
     Log name:
     MyContainer/2011/06/10/04/e0c6bb6a9a704789c525bf5d022ce2b7.log.0.gz
@@ -27,9 +29,7 @@ def format_filename(log_name):
 
 
 def cache_log(container, filename, data, directory):
-    """Writes object to file in directory specified
-
-    """
+    """Write object to file in directory specified."""
     try:
         os.makedirs('/'.join((directory, container)))
     except os.error:
@@ -39,7 +39,7 @@ def cache_log(container, filename, data, directory):
 
 
 def generate_object_list(container, path_prefix=""):
-    """Returns a list of all files in the container that match the
+    """Return a list of all files in the container that match the
     specified prefix. If no prefix supplied all objects returned.
 
     """
@@ -54,9 +54,7 @@ def generate_object_list(container, path_prefix=""):
 
 
 def list_logs(container_object, search_term, num_files=0):
-    """Lists num_files newest logs
-
-    """
+    """List num_files newest logs."""
     obj_list = generate_object_list(container_object, path_prefix=search_term)
     return  obj_list[-num_files:]
 
@@ -99,9 +97,12 @@ def get_logs(connection, container_search_term, cache=True, num_files=0,
     except cloudfiles.errors.NoSuchContainer:
         print "Either logs aren't enabled or no logs have been generated yet."
 
-if __name__ == '__main__':
-    conx = cf_connect.open_connection()
-    parser = argparse.ArgumentParser(description='Display container CDN logs.')
+
+def cmd_parser(connection, parser_class,
+               line=sys.argv[1:], prog_name=sys.argv[0]):
+    """Provide commandline interface for get_logs."""
+    parser = parser_class(description='Display container CDN logs.',
+                          prog=prog_name)
     parser.add_argument('container',
                         help='name of CDN and log enabled container')
     # counter-intuitively if nocache is True, caching will be used.
@@ -112,5 +113,9 @@ if __name__ == '__main__':
         default=0,
         type=int,
         help='number of log files to display, starting with the most recent.')
-    args = parser.parse_args()
-    print get_logs(conx, args.container, args.nocache, args.num_files)
+    args = parser.parse_args(line)
+    print get_logs(connection, args.container, args.nocache, args.num_files)
+
+if __name__ == '__main__':
+    conx = cf_connect.open_connection()
+    cmd_parser(conx, argparse.ArgumentParser)
