@@ -1,8 +1,10 @@
 __author__ = "Sandeep Sidhu <sandeep.pal.sidhu@gmail.com>"
 import cmd
 import os
-import argparse
-from cf_connect import open_connection
+import cf_display_logs
+import cf_argparser
+
+import cf_connect
 from cf_list_containers import list_containers
 from cf_list_containers import list_public_containers
 from cf_list_files import list_files
@@ -27,7 +29,7 @@ class InteractiveCloudfiles(cmd.Cmd):
         self.dst_directory = "./"
         self.verbose = 3
         self.last_output = ''
-        self.conx = open_connection()
+        self.conx = cf_connect.open_connection()
         cmd.Cmd.__init__(self)
 
     def do_list(self, line):
@@ -193,6 +195,15 @@ class InteractiveCloudfiles(cmd.Cmd):
 
     help_q = help_exit
     help_quit = help_exit
+
+    def do_display_logs(self, line):
+        """Display CDN logs for a container."""
+        try:
+            cf_display_logs.cmd_parser(self.conx, cf_argparser.ArgParseThrower,
+                                       line=line.split(),
+                                       prog_name='display_logs')
+        except cf_argparser.ArgumentError as arg_err:
+            print arg_err
 
 if __name__ == '__main__':
     InteractiveCloudfiles().cmdloop()
