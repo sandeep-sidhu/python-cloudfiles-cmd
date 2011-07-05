@@ -40,34 +40,34 @@ def open_connection_with_configfile(config_file='~/.pycflogin',verbose=0):
         if verbose >= 2: print '-Debug- Using AUTH-URL as', auth_url
     else:
         if verbose >= 1: print '-Info- %s file does not exists' % config_file
-    print '-Info- No existing configuration file found %s , would you like to create one?\n' % config_file
-    answer = raw_input('Please enter yes to provide new credentials or no to exit. [yes/no]:')
-    if answer == 'yes' or answer == 'YES':
-        username = raw_input('username:')
-        apikey = raw_input('api_key:')
-        location = raw_input('location [us/uk]:')
-        if (location == 'uk' or location == 'UK'):
-            auth_url="https://lon.auth.api.rackspacecloud.com/v1.0"
-        else:
-            auth_url="https://auth.api.rackspacecloud.com/v1.0"
+        print '-Info- No existing configuration file found %s , would you like to create one?\n' % config_file
+        answer = raw_input('Please enter yes to provide new credentials or no to exit. [yes/no]:')
+        if answer == 'yes' or answer == 'YES':
+            username = raw_input('username:')
+            apikey = raw_input('api_key:')
+            location = raw_input('location [us/uk]:')
+            if (location == 'uk' or location == 'UK'):
+                auth_url="https://lon.auth.api.rackspacecloud.com/v1.0"
+            else:
+                auth_url="https://auth.api.rackspacecloud.com/v1.0"
             if verbose >= 1: print '-Info- Logging in as', username
             if verbose >= 2: print '-Debug- Using AUTH-URL as', auth_url
-        if verbose >= 1: print '-Info Saving credentials in %s file for future use' % config_file
-        fo = open(config_file, "wb")
-        fo.write("[account]\n")
-        fo.write("username=")
-        fo.write(username)
-        fo.write("\n")
-        fo.write("apikey=")
-        fo.write(apikey)
-        fo.write("\n")
-        fo.write("location=")
-        fo.write(location)
-        fo.write("\n")
-        fo.close()
-        if verbose >= 1: print '-Debug- Credentials saved to the %s file' % config_file
-    else:
-        exit()
+            if verbose >= 1: print '-Info Saving credentials in %s file for future use' % config_file
+            fo = open(config_file, "wb")
+            fo.write("[account]\n")
+            fo.write("username=")
+            fo.write(username)
+            fo.write("\n")
+            fo.write("apikey=")
+            fo.write(apikey)
+            fo.write("\n")
+            fo.write("location=")
+            fo.write(location)
+            fo.write("\n")
+            fo.close()
+            if verbose >= 1: print '-Debug- Credentials saved to the %s file' % config_file
+        else:
+            exit()
 
     connection = cloudfiles.get_connection(username,apikey,authurl=auth_url)
     return connection
