@@ -38,13 +38,13 @@ def cache_log(container, filename, data, directory):
         f.write(data)
 
 
-def generate_object_list(container, path_prefix=""):
+def generate_object_list(container, path_prefix="", mk=""):
     """Return a list of all files in the container that match the
     specified prefix. If no prefix supplied all objects returned.
 
     """
     obj_list = []
-    mark = ''
+    mark = mk
     obj_list_temp = container.list_objects(prefix=path_prefix, marker=mark)
     while obj_list_temp:
         obj_list.extend(obj_list_temp)
@@ -53,30 +53,52 @@ def generate_object_list(container, path_prefix=""):
     return obj_list
 
 
-def list_logs(container_object, search_term, num_files=0):
-    """List num_files newest logs."""
-    obj_list = generate_object_list(container_object, path_prefix=search_term)
-    return  obj_list[-num_files:]
+def list_logs(log_container, search_term, num_files=0, start="", end=""):
+    """List log objects.
+
+    Search term must end with a '/'
+
+    """
+    first = ''.join((search_term, start))
+    obj_list = generate_object_list(log_container, path_prefix=search_term,
+                                    mk=first)
+    s = len(search_term)
+    e = len(end)
+    last = ''
+    if end:
+        for obj in obj_list[::-1]:
+            if end in obj[s:s + e]:
+                last = obj
+                break
+        try:
+            pos = obj_list.index(last) + 1
+        except ValueError:
+            pos = None
+    else:
+        pos = None
+    date_filtered_list = obj_list[:pos]
+    return date_filtered_list[-num_files:]
 
 
 def get_logs(connection, container_search_term, cache=True, num_files=0,
-             directory="DownloadedLogFiles"):
+             start_date='', end_date='', directory="DownloadedLogFiles"):
     """ Download log files for a container and cat them.
 
     cache=True controls whether or not the logs are cached not if the cache is
     read. The cache is always read.
-    default downloads all log files
     num_files is integer specifying number of files to download. The most
     recent file is num_files=1, if num_files is not specified or 0 all files
     downloaded
+    start_date and end_date can be used to filter the logs. num_files is
+    applied after the date filtering.
 
     """
-    obj = ""
-    log_object_prefix = "/".join((container_search_term, obj))
+    log_object_prefix = "".join((container_search_term, '/'))
     logs_container_name = ".CDN_ACCESS_LOGS"
     try:
         logs_container = connection.get_container(logs_container_name)
-        log_list = list_logs(logs_container, log_object_prefix, num_files)
+        log_list = list_logs(logs_container, log_object_prefix, num_files,
+                             start_date, end_date)
         data = []
         for log in log_list:
             container, filename = format_filename(log)
@@ -113,8 +135,13 @@ def cmd_parser(connection, parser_class,
         default=0,
         type=int,
         help='number of log files to display, starting with the most recent.')
+    parser.add_argument('--start_date', default='',
+                        help='display logs no older than date specified')
+    parser.add_argument('--end_date', default='',
+                        help='display logs older than date specified')
     args = parser.parse_args(line)
-    print get_logs(connection, args.container, args.nocache, args.num_files)
+    print get_logs(connection, args.container, args.nocache, args.num_files,
+                   args.start_date, args.end_date)
 
 if __name__ == '__main__':
     conx = cf_connect.open_connection()
