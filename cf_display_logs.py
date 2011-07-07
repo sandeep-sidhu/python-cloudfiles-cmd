@@ -44,12 +44,11 @@ def generate_object_list(container, path_prefix="", mk=""):
 
     """
     obj_list = []
-    mark = mk
-    obj_list_temp = container.list_objects(prefix=path_prefix, marker=mark)
+    obj_list_temp = container.list_objects(prefix=path_prefix, marker=mk)
     while obj_list_temp:
         obj_list.extend(obj_list_temp)
-        mark = obj_list[-1]
-        obj_list_temp = container.list_objects(prefix=path_prefix, marker=mark)
+        mk = obj_list[-1]
+        obj_list_temp = container.list_objects(prefix=path_prefix, marker=mk)
     return obj_list
 
 
